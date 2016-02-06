@@ -1,5 +1,5 @@
-classdef StudyDataSingleton < mlpipeline.StudyDataSingleton
-	%% StudyDataSingleton  
+classdef TestDataSingleton < mlderdeyn.StudyDataSingleton
+	%% TESTDATASINGLETON  
 
 	%  $Revision$
  	%  was created 21-Jan-2016 12:55:16
@@ -8,25 +8,6 @@ classdef StudyDataSingleton < mlpipeline.StudyDataSingleton
  	%  and checked into repository /Users/jjlee/Local/src/mlcvl/mlderdeyn/src/+mlderdeyn.
  	%% It was developed on Matlab 9.0.0.307022 (R2016a) Prerelease for MACI64.
  	
-    
-    properties (SetAccess = protected)
-        derdeynTrunk = '/Volumes/SeagateBP4/cvl'
-    end
-    
-	properties (Dependent)
-        subjectsDir
-        loggingPath
-    end
-    
-    methods %% GET
-        function g = get.subjectsDir(this)
-            g = { fullfile(this.derdeynTrunk, 'np755', '') ...
-                  fullfile(this.derdeynTrunk, 'np797', '') };
-        end
-        function g = get.loggingPath(this)
-            g = this.derdeynTrunk;
-        end
-    end
 
     methods (Static)
         function this = instance(qualifier)
@@ -38,7 +19,7 @@ classdef StudyDataSingleton < mlpipeline.StudyDataSingleton
                 end
             end            
             if (isempty(instance_))
-                instance_ = mlderdeyn.StudyDataSingleton();
+                instance_ = mlderdeyn.TestDataSingleton();
             end
             this = instance_;
         end
@@ -49,30 +30,17 @@ classdef StudyDataSingleton < mlpipeline.StudyDataSingleton
             %  has already been registered, it will not be re-registered.
             %  @param ['initialize']:  any registrations made by the ctor will be repeated.
             
-            mlderdeyn.StudyDataSingleton.instance(varargin{:});
+            mlderdeyn.TestDataSingleton.instance(varargin{:});
         end
-    end
-    
-    methods
-        function f = fslFolder(~, ~)
-            f = 'fsl';
-        end
-        function f = hdrinfoFolder(~, ~)
-            f = 'ECAT_EXACT/hdr_backup';
-        end   
-        function f = mriFolder(~, ~)
-            f = 'mri';
-        end
-        function f = petFolder(~, ~)
-            f = 'ECAT_EXACT/pet';
-        end        
-    end    
+    end  
 
     %% PROTECTED
     
-	methods (Access = protected)	 
- 		function this = StudyDataSingleton(varargin)
- 			this = this@mlpipeline.StudyDataSingleton(varargin{:});
+	methods (Access = protected)
+ 		function this = TestDataSingleton(varargin)
+ 			this = this@mlderdeyn.StudyDataSingleton(varargin{:});
+            
+            this.derdeynTrunk = '/Volumes/InnominateHD3/Local/test/cvl';
             
             dt = mlsystem.DirTools(this.subjectsDir);
             fqdns = {};
@@ -88,7 +56,7 @@ classdef StudyDataSingleton < mlpipeline.StudyDataSingleton
             this.registerThis;
         end
         function registerThis(this)
-            mlpipeline.StudyDataSingletons.register('derdeyn', this);
+            mlpipeline.StudyDataSingletons.register('test_derdeyn', this);
         end
  	end 
 
