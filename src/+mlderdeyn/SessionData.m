@@ -8,116 +8,64 @@ classdef SessionData < mlpipeline.SessionData
  	%  and checked into repository /Users/jjlee/Local/src/mlcvl/mlderdeyn/src/+mlderdeyn.
  	%% It was developed on Matlab 9.0.0.307022 (R2016a) Prerelease for MACI64.
  	
-
-	properties (Dependent)
-        aparcA2009sAseg_fqfn
-        ep2d_fqfn
-        ho_fqfn
-        mpr_fqfn
-        oc_fqfn
-        oo_fqfn
-        orig_fqfn
-        pet_fqfns
-        petfov_fqfn
-        tof_fqfn
-        toffov_fqfn
-        tr_fqfn
-        T1_fqfn
-        wmparc_fqfn
-    end
     
-    methods %% GET
-        function g = get.aparcA2009sAseg_fqfn(this)
-            g = fullfile(this.mriPath, 'aparc.a2009s+aseg.mgz');
-            if (2 ~= exist(g, 'file'))
-                g = '';
-                return
-            end
+    methods
+        function f = T1_fqfn(this)
+            f = this.fullfile(this.mriPath, 'T1.mgz');
         end
-        function g = get.ep2d_fqfn(this)
-            g = fullfile(this.fslPath, this.studyData_.ep2d_fn(this));
-            if (2 ~= exist(g, 'file'))
-                g = '';
-                return
-            end
+        function f = aparcA2009sAseg_fqfn(this)
+            f = this.fullfile(this.mriPath, 'aparc.a2009s+aseg.mgz');
         end
-        function g = get.ho_fqfn(this)
-            g = fullfile(this.petPath, this.studyData_.ho_fn(this, this.suffix));
-            if (2 ~= exist(g, 'file'))
-                g = '';
-                return
-            end
+        function f = ep2d_fqfn(this, varargin)
+            ip = inputParser;
+            addOptional(ip, 'suff', '', @ischar);
+            parse(ip, varargin{:})
+            
+            f = this.fullfile(this.fslPath, ['ep2d_default' ip.Results.suff '.nii.gz']);
+        end	
+        function f = ho_fqfn(this, varargin)
+            ip = inputParser;
+            addOptional(ip, 'suff', '', @ischar);
+            parse(ip, varargin{:})
+            
+            fp = sprintf('%sho%i', this.pnumber, this.snumber);
+            f  = this.fullfile(fullfile(this.petPath, [fp '_frames']), [fp ip.Results.suff '.nii.gz']);
         end
-        function g = get.mpr_fqfn(this)
-            g = fullfile(this.fslPath, this.studyData_.mpr_fn(this));
-            if (2 ~= exist(g, 'file'))
-                g = '';
-                return
-            end
+        function f = mpr_fqfn(this)
+            f = this.fullfile(this.fslPath, 't1_default.nii.gz');
         end
-        function g = get.oc_fqfn(this)
-            g = fullfile(this.petPath, this.studyData_.oc_fn(this, this.suffix));
-            if (2 ~= exist(g, 'file'))
-                g = '';
-                return
-            end
+        function f = oc_fqfn(this)            
+            fp = sprintf('%soc%i', this.pnumber, this.snumber);
+            f  = this.fullfile(fullfile(this.petPath, [fp '_frames']), [fp '_03.nii.gz']);
         end
-        function g = get.oo_fqfn(this)
-            g = fullfile(this.petPath, this.studyData_.oo_fn(this, this.suffix));
-            if (2 ~= exist(g, 'file'))
-                g = '';
-                return
-            end
+        function f = oo_fqfn(this, varargin)
+            ip = inputParser;
+            addOptional(ip, 'suff', '', @ischar);
+            parse(ip, varargin{:})
+              
+            fp = sprintf('%soo%i', this.pnumber, this.snumber);
+            f  = this.fullfile(fullfile(this.petPath, [fp '_frames']), [fp ip.Results.suff '.nii.gz']);
         end
-        function g = get.orig_fqfn(this)
-            g = fullfile(this.mriPath, 'orig.mgz');
+        function f = orig_fqfn(this)
+            f = this.fullfile(this.mriPath, 'orig.mgz');
         end
-        function g = get.pet_fqfns(this)
-            fqfns = { this.fdg_fqfn this.gluc_fqfn this.ho_fqfn this.oc_fqfn this.oo_fqfn this.tr_fqfn };
-            g = {};
-            for f = 1:length(fqfns)
-                if (2 == exist(fqfns{f}, 'file'))
-                    g = [g fqfns{f}];
-                end
-            end
+        function f = pet_fqfns(this)
+            f = { this.oc_fqfn this.oo_fqfn this.ho_fqfn this.tr_fqfn };
         end
-        function g = get.petfov_fqfn(this)
-            g = fullfile(this.petPath, this.studyData_.petfov_fn(this.suffix));
-            if (2 ~= exist(g, 'file'))
-                g = '';
-                return
-            end
+        function f = tof_fqfn(this)
+            f = this.fullfile(this.petPath, 'tof_default.nii.gz');
         end
-        function g = get.tof_fqfn(this)
-            g = fullfile(this.petPath, 'fdg', 'pet_proc', this.studyData_.tof_fn(this.suffix));
-            if (2 ~= exist(g, 'file'))
-                g = '';
-                return
-            end
+        function f = tr_fqfn(this)
+            fp = sprintf('%str%i', this.pnumber, this.snumber);
+            f  = this.fullfile(fullfile(this.petPath, [fp '_frames']), [fp '_01.nii.gz']);
         end
-        function g = get.toffov_fqfn(this)
-            g = fullfile(this.petPath, 'fdg', 'pet_proc', this.studyData_.toffov_fn(this.suffix));
-            if (2 ~= exist(g, 'file'))
-                g = '';
-                return
-            end
-        end
-        function g = get.tr_fqfn(this)
-            g = fullfile(this.petPath, this.studyData_.tr_fn(this, this.suffix));
-            if (2 ~= exist(g, 'file'))
-                g = '';
-                return
-            end
-        end
-        function g = get.T1_fqfn(this)
-            g = fullfile(this.mriPath, 'T1.mgz');
-        end
-        function g = get.wmparc_fqfn(this)
-            g = fullfile(this.mriPath, 'wmparc.mgz');
-        end
-    end
-
-	methods 		
+        function f = wmparc_fqfn(this)
+            f = this.fullfile(this.mriPath, 'wmparc.mgz');
+        end	
+        
+        
+        
+        
         function g = aparcA2009sAseg(this)
             g = mlmr.MRImagingContext(this.aparcA2009sAseg_fqfn);
         end
@@ -125,16 +73,26 @@ classdef SessionData < mlpipeline.SessionData
             g = mlmr.MRImagingContext(this.ep2d_fqfn);
         end
         function g = ho(this)
-            g = mlpet.PETImagingContext(this.ho_fqfn);
+            import mlpet.*;
+            if (lexist(this.ho_fqfn('_mcf')))
+                g = PETImagingContext(this.ho_fqfn('_mcf'));
+                return
+            end
+            g = PETImagingContext(this.ho_fqfn);
         end
         function g = mpr(this)
             g = mlmr.MRImagingContext(this.mpr_fqfn);
         end
-        function g = oc(this)
+        function g = oc(this) 
             g = mlpet.PETImagingContext(this.oc_fqfn);
         end
         function g = oo(this)
-            g = mlpet.PETImagingContext(this.oo_fqfn);
+            import mlpet.*;
+            if (lexist(this.oo_fqfn('_mcf')))
+                g = PETImagingContext(this.oo_fqfn('_mcf'));
+                return
+            end
+            g = PETImagingContext(this.oo_fqfn);
         end
         function g = orig(this)
             g = mlmr.MRImagingContext(this.orig_fqfn);
@@ -143,14 +101,8 @@ classdef SessionData < mlpipeline.SessionData
             g = mlpet.PETImagingContext(this.pet_fqfns);
             g = g.atlas;
         end
-        function g = petfov(this)
-            g = mlfourd.ImagingContext(this.petfov_fqfn);
-        end
         function g = tof(this)
             g = mlmr.MRImagingContext(this.tof_fqfn);
-        end
-        function g = toffov(this)
-            g = mlfourd.ImagingContext(this.toffov_fqfn);
         end
         function g = tr(this)
             g = mlpet.PETImagingContext(this.tr_fqfn);

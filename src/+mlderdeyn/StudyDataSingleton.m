@@ -65,9 +65,9 @@ classdef StudyDataSingleton < mlpipeline.StudyDataSingleton
         end
         function f = petFolder(~, ~)
             f = 'ECAT_EXACT/pet';
-        end        
-    end    
-
+        end
+    end
+    
     %% PROTECTED
     
 	methods (Access = protected)	 
