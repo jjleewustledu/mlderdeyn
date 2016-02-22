@@ -100,6 +100,9 @@ classdef SessionData < mlpipeline.SessionData
         function g = petAtlas(this)
             g = mlpet.PETImagingContext(this.pet_fqfns);
             g = g.atlas;
+        end      
+        function p = petPointSpread(~)
+            p = mlpet.PETRegistry.instance.petPointSpread;
         end
         function g = tof(this)
             g = mlmr.MRImagingContext(this.tof_fqfn);

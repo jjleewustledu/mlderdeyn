@@ -65,9 +65,9 @@ classdef RegistrationFacade < mlfsl.RegistrationFacade
         function product = initialTalairachProduct(this)            
             product.talairach = this.talairach;
             product.oc1       = this.oc(1);
-            product.oo1       = this.petMotionCorrect(this.oo(1));
-            product.ho1       = this.petMotionCorrect(this.ho(1));
-            product.tr1       = this.petMotionCorrect(this.tr(1));
+            product.oo1       = this.oo(1);
+            product.ho1       = this.ho(1);
+            product.tr1       = this.tr(1);
             
             pet = mlpet.PETImagingContext( ...
                     this.annihilateEmptyCells({ ...
