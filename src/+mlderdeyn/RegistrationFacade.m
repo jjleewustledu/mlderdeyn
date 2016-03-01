@@ -18,7 +18,7 @@ classdef RegistrationFacade < mlfsl.RegistrationFacade
                     sessd = iter.next;
                     rb = mlfsl.MultispectralRegistrationBuilder('sessionData', sessd);
                     rf = mlderdeyn.RegistrationFacade('sessionData', sessd, 'registrationBuilder', rb);
-                    rf.registerTalairachWithPet;
+                    rf.registerTalairachOnPet;
                 catch ME
                     handwarning(ME);
                 end
@@ -35,11 +35,11 @@ classdef RegistrationFacade < mlfsl.RegistrationFacade
             end
             g = this.pet_;
         end
-        function product = registerTalairachWithPet(this)
+        function product = registerTalairachOnPet(this)
             %% REGISTERTALAIRACHWITHPET
             %  @return product is a struct with products as fields.
             
-            product = this.initialTalairachProduct;
+            product = this.initialImaging;
             
             msrb = mlfsl.MultispectralRegistrationBuilder('sessionData', this.sessionData);
             msrb.sourceImage = product.talairach;
@@ -60,9 +60,9 @@ classdef RegistrationFacade < mlfsl.RegistrationFacade
             end
             
             product = this.finalTalairachProduct(product);
-            save(this.checkpointFqfilename('registerTalairachWithPet'), 'product');
+            save(this.checkpointFqfilename('registerTalairachOnPet'), 'product');
         end 
-        function product = initialTalairachProduct(this)            
+        function product = initialImaging(this)            
             product.talairach = this.talairach;
             product.oc1       = this.oc(1);
             product.oo1       = this.oo(1);
@@ -80,7 +80,7 @@ classdef RegistrationFacade < mlfsl.RegistrationFacade
             product.talairach_on_ho1 = this.transform(product.tal_on_atl, product.xfm_atl_on_ho1, product.ho1);
             product.talairach_on_tr1 = this.transform(product.tal_on_atl, product.xfm_atl_on_tr1, product.tr1);
         end
-        function masks = masksTalairachProduct(this, msk, product)
+        function masks = masksTalairachOnProduct(this, msk, product)
             assert(all(msk.niftid.size == product.talairach.niftid.size));
             this.sessionData.ensureNIFTI_GZ(msk);
             
@@ -90,7 +90,7 @@ classdef RegistrationFacade < mlfsl.RegistrationFacade
             masks.talairach_on_oo1 = this.transform(masks.talairach_on_atl, product.xfm_atl_on_oo1, product.oo1, t);
             masks.talairach_on_ho1 = this.transform(masks.talairach_on_atl, product.xfm_atl_on_ho1, product.ho1, t);
             masks.talairach_on_tr1 = this.transform(masks.talairach_on_atl, product.xfm_atl_on_tr1, product.tr1, t);
-            save(this.checkpointFqfilename('masksTalairachProduct'), 'masks');
+            save(this.checkpointFqfilename('masksTalairachOnProduct'), 'masks');
         end
 		  
  		function this = RegistrationFacade(varargin)
