@@ -10,7 +10,7 @@ classdef StudyDataSingleton < mlpipeline.StudyDataSingleton
  	
     
     properties (SetAccess = protected)
-        derdeynTrunk = '/Volumes/SeagateBP4/cvl'
+        derdeynTrunk = getenv('CVL')
     end
     
 	properties (Dependent)
