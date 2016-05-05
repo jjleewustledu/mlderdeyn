@@ -9,6 +9,17 @@ classdef SessionData < mlpipeline.SessionData
  	%% It was developed on Matlab 9.0.0.307022 (R2016a) Prerelease for MACI64.
  	
     
+    properties (Dependent)        
+        petBlur
+    end
+    
+    methods %% GET        
+        function g = get.petBlur(~)
+            g = mlpet.PETRegistry.instance.petPointSpread;
+            g = mean(g);
+        end
+    end
+    
     methods
         function f = T1_fqfn(this)
             f = this.fullfile(this.mriPath, 'T1.mgz');
