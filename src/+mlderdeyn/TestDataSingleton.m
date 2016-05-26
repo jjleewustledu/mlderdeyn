@@ -40,7 +40,7 @@ classdef TestDataSingleton < mlderdeyn.StudyDataSingleton
  		function this = TestDataSingleton(varargin)
  			this = this@mlderdeyn.StudyDataSingleton(varargin{:});
             
-            this.derdeynTrunk = '/Volumes/InnominateHD3/Local/test/cvl';
+            this.derdeynTrunk =fullfile(getenv('UNITTESTS'), 'cvl', '');
             
             dt = mlsystem.DirTools(this.subjectsDir);
             fqdns = {};
