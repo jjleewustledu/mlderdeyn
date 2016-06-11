@@ -15,16 +15,12 @@ classdef StudyDataSingleton < mlpipeline.StudyDataSingleton
     
 	properties (Dependent)
         subjectsDir
-        loggingPath
     end
     
     methods %% GET
         function g = get.subjectsDir(this)
             g = { fullfile(this.derdeynTrunk, 'np755', '') ...
                   fullfile(this.derdeynTrunk, 'np797', '') };
-        end
-        function g = get.loggingPath(this)
-            g = this.derdeynTrunk;
         end
     end
 
@@ -54,6 +50,30 @@ classdef StudyDataSingleton < mlpipeline.StudyDataSingleton
     end
     
     methods
+        function loc  = loggingLocation(this, varargin)
+            ip = inputParser;
+            addParameter(ip, 'type', 'path', @(x) this.isLocationType(x));
+            parse(ip, varargin{:});
+            
+            switch (ip.Results.type)
+                case 'folder'
+                    [~,loc] = fileparts(this.derdeynTrunk);
+                case 'path'
+                    loc = this.derdeynTrunk;
+                otherwise
+                    error('mlpipeline:insufficientSwitchCases', ...
+                          'StudyDataSingleton.loggingLocation.ip.Results.type->%s not recognized', ip.Results.type);
+            end
+        end        
+        function sess = sessionData(varargin)
+            %% SESSIONDATA
+            %  @param parameter names and values expected by mlderdeyn.SessionData;
+            %  'studyData' and this are implicitly supplied.
+            %  @returns mlderdeyn.SessionData object
+            
+            sess = mlderdeyn.SessionData('studyData', this, varargin{:});
+        end 
+        
         function f = fslFolder(~, ~)
             f = 'fsl';
         end
