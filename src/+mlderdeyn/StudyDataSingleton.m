@@ -9,106 +9,88 @@ classdef StudyDataSingleton < mlpipeline.StudyDataSingleton
  	%% It was developed on Matlab 9.0.0.307022 (R2016a) Prerelease for MACI64.
  	
     
-    properties (SetAccess = protected)
-        derdeynTrunk = getenv('CVL')
-    end
-    
-	properties (Dependent)
-        subjectsDir
-    end
-    
-    methods %% GET
-        function g = get.subjectsDir(this)
-            g = { fullfile(this.derdeynTrunk, 'np755', '') ...
-                  fullfile(this.derdeynTrunk, 'np797', '') };
-        end
-    end
-
     methods (Static)
-        function this = instance(qualifier)
-            persistent instance_            
-            if (exist('qualifier','var'))
-                assert(ischar(qualifier));
-                if (strcmp(qualifier, 'initialize'))
-                    instance_ = [];
-                end
-            end            
+        function this = instance(varargin)
+            persistent instance_
+            if (~isempty(varargin))
+                instance_ = [];
+            end
             if (isempty(instance_))
-                instance_ = mlderdeyn.StudyDataSingleton();
+                instance_ = mlderdeyn.StudyDataSingleton(varargin{:});
             end
             this = instance_;
         end
-        function        register(varargin)
-            %% REGISTER
-            %  @param []:  if this class' persistent instance
-            %  has not been registered, it will be registered via instance() call to the ctor; if it
-            %  has already been registered, it will not be re-registered.
-            %  @param ['initialize']:  any registrations made by the ctor will be repeated.
-            
-            mlderdeyn.StudyDataSingleton.instance(varargin{:});
+        function d    = subjectsDir
+            d = { fullfile(getenv('CVL'), 'np755', '') ...
+                  fullfile(getenv('CVL'), 'np797', '') };
         end
     end
     
-    methods
-        function loc  = loggingLocation(this, varargin)
+    methods   
+        function        register(this, varargin)
+            %% REGISTER this class' persistent instance with mlpipeline.StudyDataSingletons
+            %  using the latter class' register methods.
+            %  @param key is any registration key stored by mlpipeline.StudyDataSingletons; default 'derdeyn'.
+            
             ip = inputParser;
-            addParameter(ip, 'type', 'path', @(x) this.isLocationType(x));
+            addOptional(ip, 'key', 'derdeyn', @ischar);
             parse(ip, varargin{:});
-            
-            switch (ip.Results.type)
-                case 'folder'
-                    [~,loc] = fileparts(this.derdeynTrunk);
-                case 'path'
-                    loc = this.derdeynTrunk;
-                otherwise
-                    error('mlpipeline:insufficientSwitchCases', ...
-                          'StudyDataSingleton.loggingLocation.ip.Results.type->%s not recognized', ip.Results.type);
-            end
-        end        
-        function sess = sessionData(varargin)
+            mlpipeline.StudyDataSingletons.register(ip.Results.key, this);
+        end
+        function this = replaceSessionData(this, varargin)
+            %% REPLACESESSIONDATA
+            %  @param [parameter name,  parameter value, ...] as expected by mlderdeyn.SessionData are optional;
+            %  'studyData' and this are always internally supplied.
+            %  @returns this.
+
+            this.sessionDataComposite_ = mlpatterns.CellComposite({ ...
+                mlderdeyn.SessionData('studyData', this, varargin{:})});
+        end
+        function sess = sessionData(this, varargin)
             %% SESSIONDATA
-            %  @param parameter names and values expected by mlderdeyn.SessionData;
-            %  'studyData' and this are implicitly supplied.
-            %  @returns mlderdeyn.SessionData object
+            %  @param [parameter name,  parameter value, ...] as expected by mlderdeyn.SessionData are optional;
+            %  'studyData' and this are always internally supplied.
+            %  @returns for empty param:  mlpatterns.CellComposite object or it's first element when singleton, 
+            %  which are instances of mlderdeyn.SessionData.
+            %  @returns for non-empty param:  instance of mlderdeyn.SessionData corresponding to supplied params.
             
+            if (isempty(varargin))
+                sess = this.sessionDataComposite_;
+                if (1 == length(sess))
+                    sess = sess.get(1);
+                end
+                return
+            end
             sess = mlderdeyn.SessionData('studyData', this, varargin{:});
         end 
-        
-        function f = fslFolder(~, ~)
-            f = 'fsl';
-        end
-        function f = hdrinfoFolder(~, ~)
-            f = 'ECAT_EXACT/hdr_backup';
-        end   
-        function f = mriFolder(~, ~)
-            f = 'mri';
-        end
-        function f = petFolder(~, ~)
-            f = 'ECAT_EXACT/pet';
-        end
+        function f    = subjectsDirFqdns(this)
+            dt = mlsystem.DirTools(this.subjectsDir);
+            f = {};
+            for di = 1:length(dt.dns)
+                e = regexp(dt.dns{di}, 'mm\d{2}-\d{3}', 'match');
+                if (~isempty(e))
+                    f = [f dt.fqdns(di)]; %#ok<AGROW>
+                end
+            end
+        end 
     end
     
     %% PROTECTED
     
-	methods (Access = protected)	 
+	methods (Access = protected)
  		function this = StudyDataSingleton(varargin)
  			this = this@mlpipeline.StudyDataSingleton(varargin{:});
-            
-            dt = mlsystem.DirTools(this.subjectsDir);
-            fqdns = {};
-            for di = 1:length(dt.dns)
-                if (lstrfind(dt.dns{di}, 'mm0') || lstrfind(dt.dns{di}, 'wu0'))
-                    fqdns = [fqdns dt.fqdns(di)];
+        end
+        function this = assignSessionDataCompositeFromPaths(this, varargin)
+            if (isempty(this.sessionDataComposite_))
+                for v = 1:length(varargin)
+                    if (ischar(varargin{v}) && isdir(varargin{v}))                    
+                        this.sessionDataComposite_ = ...
+                            this.sessionDataComposite_.add( ...
+                                mlderdeyn.SessionData('studyData', this, 'sessionPath', varargin{v}));
+                    end
                 end
             end
-            this.sessionDataComposite_ = ...
-                mlpatterns.CellComposite( ...
-                    cellfun(@(x) mlderdeyn.SessionData('studyData', this, 'sessionPath', x), ...
-                    fqdns, 'UniformOutput', false));
-            this.registerThis;
-        end
-        function registerThis(this)
-            mlpipeline.StudyDataSingletons.register('derdeyn', this);
         end
  	end 
 

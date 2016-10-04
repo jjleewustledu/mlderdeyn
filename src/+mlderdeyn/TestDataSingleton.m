@@ -40,8 +40,6 @@ classdef TestDataSingleton < mlderdeyn.StudyDataSingleton
  		function this = TestDataSingleton(varargin)
  			this = this@mlderdeyn.StudyDataSingleton(varargin{:});
             
-            this.derdeynTrunk =fullfile(getenv('UNITTESTS'), 'cvl', '');
-            
             dt = mlsystem.DirTools(this.subjectsDir);
             fqdns = {};
             for di = 1:length(dt.dns)
