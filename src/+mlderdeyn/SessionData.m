@@ -55,29 +55,29 @@ classdef SessionData < mlpipeline.SessionData
                 
         %% IPETData
         
-        function loc = cossLocation(this, typ)
-            loc = this.studyData_.locationType(typ, ...
-                fullfile(this.vLocation('path'), 'ECAT_EXACT', 'coss', ''));
-        end
-        function loc = hdrinfoLocation(this, typ)
-            loc = this.studyData_.locationType(typ, ...
-                fullfile(this.vLocation('path'), 'ECAT_EXACT', 'hdr_backup', ''));
-        end
-        function loc = petLocation(this, typ)
-            loc = this.studyData_.locationType(typ, ...
-                fullfile(this.vLocation('path'), 'ECAT_EXACT', 'pet', ''));
-        end
-        function obj = petObject(this, varargin)
+        function loc = cossLocation(this, varargin)
             ip = inputParser;
-            addRequired( ip, 'tracer', @ischar);
-            addParameter(ip, 'suffix', '', @ischar);
-            addParameter(ip, 'typ', 'mlpet.PETImagingContext', @ischar);
+            addParameter(ip, 'typ', 'path', @ischar);
             parse(ip, varargin{:});
             
-            obj = this.studyData_.imagingType(ip.Results.typ, ...
-                fullfile(this.petLocation('path'), ...
-                         sprintf('%s%s%i%s_frames', this.pnumber, ip.Results.tracer, this.snumber, this.nacSuffix), ...
-                         sprintf('%s%s%i%s%s%s', this.pnumber, ip.Results.tracer, this.snumber, this.nacSuffix, ip.Results.suffix, this.filetypeExt)));
+            loc = this.studyData_.locationType(ip.Results.typ, ...
+                fullfile(this.vLocation, 'ECAT_EXACT', 'coss', ''));
+        end
+        function loc = hdrinfoLocation(this, varargin)
+            ip = inputParser;
+            addParameter(ip, 'typ', 'path', @ischar);
+            parse(ip, varargin{:});
+            
+            loc = this.studyData_.locationType(ip.Results.typ, ...
+                fullfile(this.vLocation, 'ECAT_EXACT', 'hdr_backup', ''));
+        end
+        function loc = petLocation(this, varargin)
+            ip = inputParser;
+            addParameter(ip, 'typ', 'path', @ischar);
+            parse(ip, varargin{:});
+            
+            loc = this.studyData_.locationType(ip.Results.typ, ...
+                fullfile(this.vLocation, 'ECAT_EXACT', 'pet', ''));
         end
         
         function obj = petAtlas(this)
@@ -88,7 +88,22 @@ classdef SessionData < mlpipeline.SessionData
         function p   = petPointSpread(~)
             p = mlpet.PETRegistry.instance.petPointSpread;
         end
- 	end 
+    end 
+    
+    methods (Access = protected)        
+        function obj = petObject(this, varargin)
+            ip = inputParser;
+            addRequired( ip, 'tracer', @ischar);
+            addParameter(ip, 'suffix', '', @ischar);
+            addParameter(ip, 'typ', 'mlpet.PETImagingContext', @ischar);
+            parse(ip, varargin{:});
+            
+            obj = this.studyData_.imagingType(ip.Results.typ, ...
+                fullfile(this.petLocation, ...
+                         sprintf('%s%s%i%s_frames', this.pnumber, ip.Results.tracer, this.snumber, this.nacSuffix), ...
+                         sprintf('%s%s%i%s%s%s', this.pnumber, ip.Results.tracer, this.snumber, this.nacSuffix, ip.Results.suffix, this.filetypeExt)));
+        end        
+    end
     
 	%  Created with Newcl by John J. Lee after newfcn by Frank Gonzalez-Morphy
  end
