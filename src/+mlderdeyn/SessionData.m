@@ -60,7 +60,7 @@ classdef SessionData < mlpipeline.SessionData
             addParameter(ip, 'typ', 'path', @ischar);
             parse(ip, varargin{:});
             
-            loc = this.studyData_.locationType(ip.Results.typ, ...
+            loc = locationType(ip.Results.typ, ...
                 fullfile(this.vLocation, 'ECAT_EXACT', 'coss', ''));
         end
         function loc = hdrinfoLocation(this, varargin)
@@ -68,7 +68,7 @@ classdef SessionData < mlpipeline.SessionData
             addParameter(ip, 'typ', 'path', @ischar);
             parse(ip, varargin{:});
             
-            loc = this.studyData_.locationType(ip.Results.typ, ...
+            loc = locationType(ip.Results.typ, ...
                 fullfile(this.vLocation, 'ECAT_EXACT', 'hdr_backup', ''));
         end
         function loc = petLocation(this, varargin)
@@ -76,7 +76,7 @@ classdef SessionData < mlpipeline.SessionData
             addParameter(ip, 'typ', 'path', @ischar);
             parse(ip, varargin{:});
             
-            loc = this.studyData_.locationType(ip.Results.typ, ...
+            loc = locationType(ip.Results.typ, ...
                 fullfile(this.vLocation, 'ECAT_EXACT', 'pet', ''));
         end
         
@@ -98,7 +98,7 @@ classdef SessionData < mlpipeline.SessionData
             addParameter(ip, 'typ', 'mlpet.PETImagingContext', @ischar);
             parse(ip, varargin{:});
             
-            obj = this.studyData_.imagingType(ip.Results.typ, ...
+            obj = imagingType(ip.Results.typ, ...
                 fullfile(this.petLocation, ...
                          sprintf('%s%s%i_frames', this.pnumber, ip.Results.tracer, this.snumber), ...
                          sprintf('%s%s%i%s%s', this.pnumber, ip.Results.tracer, this.snumber, ip.Results.suffix, this.filetypeExt)));
