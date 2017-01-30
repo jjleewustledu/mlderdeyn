@@ -9,8 +9,9 @@ classdef SessionData < mlpipeline.SessionData
  	%% It was developed on Matlab 9.0.0.307022 (R2016a) Prerelease for MACI64.
  	
     
-    properties 
+    properties
         filetypeExt = '.nii.gz'
+        petPlatform = 'ecat';
     end
     
     properties (Dependent)
@@ -38,15 +39,16 @@ classdef SessionData < mlpipeline.SessionData
             %         'tag'         is appended to the fileprefix
 
  			this = this@mlpipeline.SessionData(varargin{:});
-            this.ac_ = true;
+            this.attenuationCorrected_ = true;
+            this.tracer_ = 'HO';
         end
-        
+                
         %% IMRData
                
         function obj = ep2d(this, varargin)
             obj = this.mrObject('ep2d_default_mcf', varargin{:});
         end
-        function obj = mpr(this, varargin)
+        function obj = mprage(this, varargin)
             obj = this.mrObject('t1_default', varargin{:});
         end
         function obj = tof(this, varargin)
@@ -80,6 +82,27 @@ classdef SessionData < mlpipeline.SessionData
                 fullfile(this.vLocation, 'ECAT_EXACT', 'pet', ''));
         end
         
+        function obj = aif(this, varargin)
+            obj = mlpet.UncorrectedDCV.load( ...
+                fullfile(this.petLocation, [this.ho('typ', 'fp') '.dcv']));
+        end
+        function obj = pet(this, varargin)
+            obj = this.petG3Object(this.tracer, varargin{:});
+        end
+        function obj = mask(this, varargin) 
+            ip = inputParser;
+            ip.KeepUnmatched = true;
+            addParameter(ip, 'typ', 'mlmr.MRImagingContext', @ischar);
+            parse(ip, varargin{:});
+            
+            obj = imagingType(ip.Results.typ, ...
+                fullfile(this.sessionPath, 'petaif', ...
+                         sprintf('b%s_mask_on_%s_meanvol%s', ...
+                         this.mprage('typ', 'fp'), this.ho('typ', 'fp'), this.filetypeExt)));
+        end
+        function p   = pie(~)
+            p = 5.2038;
+        end
         function obj = petAtlas(this)
             obj = mlpet.PETImagingContext( ...
                 cellfun(@(x) this.petObject(x, 'fqfn'), {'oc' 'oo' 'ho' 'tr'}));
@@ -88,9 +111,6 @@ classdef SessionData < mlpipeline.SessionData
         function p   = petPointSpread(~)
             p = mlpet.PETRegistry.instance.petPointSpread;
         end
-    end 
-    
-    methods (Access = protected)        
         function obj = petObject(this, varargin)
             ip = inputParser;
             addRequired( ip, 'tracer', @ischar);
@@ -100,8 +120,20 @@ classdef SessionData < mlpipeline.SessionData
             
             obj = imagingType(ip.Results.typ, ...
                 fullfile(this.petLocation, ...
-                         sprintf('%s%s%i_frames', this.pnumber, ip.Results.tracer, this.snumber), ...
-                         sprintf('%s%s%i%s%s', this.pnumber, ip.Results.tracer, this.snumber, ip.Results.suffix, this.filetypeExt)));
+                         sprintf('%s%s%i_frames', this.pnumber, lower(ip.Results.tracer), this.snumber), ...
+                         sprintf('%s%s%i%s%s', this.pnumber, lower(ip.Results.tracer), this.snumber, ip.Results.suffix, this.filetypeExt)));
+        end  
+        function obj = petG3Object(this, varargin)
+            ip = inputParser;
+            addRequired( ip, 'tracer', @ischar);
+            addParameter(ip, 'suffix', '_g3', @ischar);
+            addParameter(ip, 'typ', 'mlpet.PETImagingContext', @ischar);
+            parse(ip, varargin{:});
+            
+            obj = imagingType(ip.Results.typ, ...
+                fullfile(this.petLocation, ...
+                         sprintf('%s%s%i%s%s', ...
+                                 this.pnumber, lower(ip.Results.tracer), this.snumber, ip.Results.suffix, this.filetypeExt)));
         end        
     end
     

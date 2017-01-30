@@ -9,6 +9,10 @@ classdef StudyDataSingleton < mlpipeline.StudyDataSingleton
  	%% It was developed on Matlab 9.0.0.307022 (R2016a) Prerelease for MACI64.
  	
     
+    properties 
+        subjectsFolder = {'np755' 'np797'}
+    end
+    
     methods (Static)
         function this = instance(varargin)
             persistent instance_
@@ -20,13 +24,12 @@ classdef StudyDataSingleton < mlpipeline.StudyDataSingleton
             end
             this = instance_;
         end
-        function d    = subjectsDir
-            d = { fullfile(getenv('CVL'), 'np755', '') ...
-                  fullfile(getenv('CVL'), 'np797', '') };
-        end
     end
     
-    methods   
+    methods
+        function d    = freesurfersDir(this)
+            d = this.subjectsDir;
+        end
         function        register(this, varargin)
             %% REGISTER this class' persistent instance with mlpipeline.StudyDataSingletons
             %  using the latter class' register methods.
@@ -63,6 +66,9 @@ classdef StudyDataSingleton < mlpipeline.StudyDataSingleton
             end
             sess = mlderdeyn.SessionData('studyData', this, varargin{:});
         end 
+        function d    = subjectsDir(this)
+            d = cellfun(@(x) fullfile(getenv('CVL'), x, ''), this.subjectsFolder, 'UniformOutput', false);
+        end
         function f    = subjectsDirFqdns(this)
             dt = mlsystem.DirTools(this.subjectsDir);
             f = {};
