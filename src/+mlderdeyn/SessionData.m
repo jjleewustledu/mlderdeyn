@@ -82,14 +82,35 @@ classdef SessionData < mlpipeline.SessionData
                 fullfile(this.vLocation, 'ECAT_EXACT', 'pet', ''));
         end
         
-        function obj = aif(this, varargin)
-            obj = mlpet.UncorrectedDCV.load( ...
-                fullfile(this.petLocation, [this.ho('typ', 'fp') '.dcv']));
+        function obj = cbf(this, varargin)
+            obj = this.petG3Object('cbf', varargin{:});
+        end
+        function obj = cbv(this, varargin)
+            obj = this.petG3Object('cbv', varargin{:});
+        end
+        function fqfn = crv(this, varargin)
+            fp   = this.petObject(this.tracer, 'typ', 'fp');
+            fqfn = fullfile(this.petLocation, [fp '.crv']);
+        end
+        function fqfn = dcv(this, varargin)
+            fp   = this.petObject(this.tracer, 'typ', 'fp');
+            fqfn = fullfile(this.petLocation, [fp '.dcv']);
+        end
+        function obj = oc(this, varargin)
+            ip = inputParser;
+            addParameter(ip, 'suffix', '', @ischar);
+            addParameter(ip, 'typ', 'mlpet.PETImagingContext', @ischar);
+            parse(ip, varargin{:});
+            
+            obj = imagingType(ip.Results.typ, ...
+                fullfile(this.petLocation, ...
+                         sprintf('%soc%i_frames', this.pnumber, this.snumber), ...
+                         sprintf('%soc%i_03%s%s', this.pnumber, this.snumber, ip.Results.suffix, this.filetypeExt)));
         end
         function obj = pet(this, varargin)
             obj = this.petG3Object(this.tracer, varargin{:});
         end
-        function obj = mask(this, varargin) 
+        function obj = mask(this, varargin)
             ip = inputParser;
             ip.KeepUnmatched = true;
             addParameter(ip, 'typ', 'mlmr.MRImagingContext', @ischar);
@@ -99,6 +120,9 @@ classdef SessionData < mlpipeline.SessionData
                 fullfile(this.sessionPath, 'petaif', ...
                          sprintf('b%s_mask_on_%s_meanvol%s', ...
                          this.mprage('typ', 'fp'), this.ho('typ', 'fp'), this.filetypeExt)));
+        end
+        function obj = oef(this, varargin)
+            obj = this.petG3Object('oef', varargin{:});
         end
         function p   = pie(~)
             p = 5.2038;
