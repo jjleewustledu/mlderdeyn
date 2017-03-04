@@ -21,7 +21,6 @@ classdef SessionData < mlpipeline.SessionData
     methods %% GET
         function g = get.petBlur(~)
             g = mlpet.PETRegistry.instance.petPointSpread;
-            g = mean(g);
         end
     end
     
