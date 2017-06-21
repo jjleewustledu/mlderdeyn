@@ -11,7 +11,6 @@ classdef SessionData < mlpipeline.SessionData
     
     properties
         filetypeExt = '.nii.gz'
-        petPlatform = 'ecat';
     end
     
     properties (Dependent)
