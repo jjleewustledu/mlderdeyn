@@ -24,22 +24,6 @@ classdef SessionData < mlpipeline.SessionData
     end
     
     methods
- 		function this = SessionData(varargin)
- 			%% SESSIONDATA
- 			%  @param [param-name, param-value[, ...]]
-            %         'ac'          is logical
-            %         'rnumber'     is numeric
-            %         'sessionPath' is a path to the session data
-            %         'studyData'   is a mlpipeline.StudyDataSingleton
-            %         'snumber'     is numeric
-            %         'tracer'      is char
-            %         'vnumber'     is numeric
-            %         'tag'         is appended to the fileprefix
-
- 			this = this@mlpipeline.SessionData(varargin{:});
-            this.attenuationCorrected_ = true;
-            this.tracer_ = 'HO';
-        end
                 
         %% IMRData
                
@@ -156,7 +140,26 @@ classdef SessionData < mlpipeline.SessionData
                 fullfile(this.petLocation, ...
                          sprintf('%s%s%i%s%s', ...
                                  this.pnumber, lower(ip.Results.tracer), this.snumber, ip.Results.suffix, this.filetypeExt)));
-        end        
+        end      
+        
+        %%        
+        
+ 		function this = SessionData(varargin)
+ 			%% SESSIONDATA
+ 			%  @param [param-name, param-value[, ...]]
+            %         'ac'          is logical
+            %         'rnumber'     is numeric
+            %         'sessionPath' is a path to the session data
+            %         'studyData'   is a mlpipeline.StudyDataSingleton
+            %         'snumber'     is numeric
+            %         'tracer'      is char
+            %         'vnumber'     is numeric
+            %         'tag'         is appended to the fileprefix
+
+ 			this = this@mlpipeline.SessionData(varargin{:});
+            this.attenuationCorrected_ = true;
+            this.tracer_ = 'HO';
+        end
     end
     
 	%  Created with Newcl by John J. Lee after newfcn by Frank Gonzalez-Morphy
