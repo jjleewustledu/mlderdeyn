@@ -11,6 +11,7 @@ classdef SessionData < mlpipeline.SessionData
     
     properties
         filetypeExt = '.nii.gz'
+        resolveTag = ''
     end
     
     properties (Dependent)
@@ -27,6 +28,10 @@ classdef SessionData < mlpipeline.SessionData
                 
         %% IMRData
                
+        function obj = aparcAsegBinarized(this, varargin)
+            fqfn = fullfile(this.mriLocation, sprintf('aparcAsegBinarized%s', this.filetypeExt));
+            obj  = this.fqfilenameObject(fqfn, varargin{:});
+        end
         function obj = ep2d(this, varargin)
             obj = this.mrObject('ep2d_default_mcf', varargin{:});
         end
@@ -140,7 +145,11 @@ classdef SessionData < mlpipeline.SessionData
                 fullfile(this.petLocation, ...
                          sprintf('%s%s%i%s%s', ...
                                  this.pnumber, lower(ip.Results.tracer), this.snumber, ip.Results.suffix, this.filetypeExt)));
-        end      
+        end     
+        function [dt0_,date_] = readDatetime0(~)
+            dt0_ = datetime;
+            date_ = datetime(dt0_.Year, dt0_.Month, dt0_.Day);
+        end
         
         %%        
         

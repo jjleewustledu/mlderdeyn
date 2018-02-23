@@ -13,6 +13,10 @@ classdef StudyDataSingleton < mlpipeline.StudyDataSingleton
         subjectsFolder = {'np755' 'np797'}
     end
     
+    properties (Dependent)
+        subjectsDir
+    end
+    
     methods (Static)
         function this = instance(varargin)
             persistent instance_
@@ -27,6 +31,23 @@ classdef StudyDataSingleton < mlpipeline.StudyDataSingleton
     end
     
     methods
+        
+        %% GET        
+        
+        function g    = get.subjectsDir(this)
+            if (~isempty(this.subjectsDir_))
+                g = this.subjectsDir_;
+                return
+            end
+            g = cellfun(@(x) fullfile(getenv('CVL'), x, ''), this.subjectsFolder, 'UniformOutput', false);
+        end
+        function this = set.subjectsDir(this, s)
+            assert(isdir(s));
+            this.subjectsDir_ = s;
+        end
+        
+        %% 
+       
         function d    = freesurfersDir(this)
             d = this.subjectsDir;
         end
@@ -66,9 +87,6 @@ classdef StudyDataSingleton < mlpipeline.StudyDataSingleton
             end
             sess = mlderdeyn.SessionData('studyData', this, varargin{:});
         end 
-        function d    = subjectsDir(this)
-            d = cellfun(@(x) fullfile(getenv('CVL'), x, ''), this.subjectsFolder, 'UniformOutput', false);
-        end
         function f    = subjectsDirFqdns(this)
             dt = mlsystem.DirTools(this.subjectsDir);
             f = {};
@@ -98,7 +116,13 @@ classdef StudyDataSingleton < mlpipeline.StudyDataSingleton
                 end
             end
         end
- 	end 
+    end 
+    
+    %% PRIVATE
+    
+    properties 
+        subjectsDir_
+    end
 
 	%  Created with Newcl by John J. Lee after newfcn by Frank Gonzalez-Morphy
  end
