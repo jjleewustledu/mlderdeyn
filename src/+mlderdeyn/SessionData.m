@@ -85,14 +85,14 @@ classdef SessionData < mlpipeline.SessionData
         end
         function obj = oc(this, varargin)
             ip = inputParser;
-            addParameter(ip, 'suffix', '', @ischar);
+            addParameter(ip, 'tag', '', @ischar);
             addParameter(ip, 'typ', 'mlpet.PETImagingContext', @ischar);
             parse(ip, varargin{:});
             
             obj = imagingType(ip.Results.typ, ...
                 fullfile(this.petLocation, ...
                          sprintf('%soc%i_frames', this.pnumber, this.snumber), ...
-                         sprintf('%soc%i_03%s%s', this.pnumber, this.snumber, ip.Results.suffix, this.filetypeExt)));
+                         sprintf('%soc%i_03%s%s', this.pnumber, this.snumber, ip.Results.tag, this.filetypeExt)));
         end
         function obj = pet(this, varargin)
             obj = this.petG3Object(this.tracer, varargin{:});
@@ -125,26 +125,26 @@ classdef SessionData < mlpipeline.SessionData
         function obj = petObject(this, varargin)
             ip = inputParser;
             addRequired( ip, 'tracer', @ischar);
-            addParameter(ip, 'suffix', '', @ischar);
+            addParameter(ip, 'tag', '', @ischar);
             addParameter(ip, 'typ', 'mlpet.PETImagingContext', @ischar);
             parse(ip, varargin{:});
             
             obj = imagingType(ip.Results.typ, ...
                 fullfile(this.petLocation, ...
                          sprintf('%s%s%i_frames', this.pnumber, lower(ip.Results.tracer), this.snumber), ...
-                         sprintf('%s%s%i%s%s', this.pnumber, lower(ip.Results.tracer), this.snumber, ip.Results.suffix, this.filetypeExt)));
+                         sprintf('%s%s%i%s%s', this.pnumber, lower(ip.Results.tracer), this.snumber, ip.Results.tag, this.filetypeExt)));
         end  
         function obj = petG3Object(this, varargin)
             ip = inputParser;
             addRequired( ip, 'tracer', @ischar);
-            addParameter(ip, 'suffix', '_g3', @ischar);
+            addParameter(ip, 'tag', '_g3', @ischar);
             addParameter(ip, 'typ', 'mlpet.PETImagingContext', @ischar);
             parse(ip, varargin{:});
             
             obj = imagingType(ip.Results.typ, ...
                 fullfile(this.petLocation, ...
                          sprintf('%s%s%i%s%s', ...
-                                 this.pnumber, lower(ip.Results.tracer), this.snumber, ip.Results.suffix, this.filetypeExt)));
+                                 this.pnumber, lower(ip.Results.tracer), this.snumber, ip.Results.tag, this.filetypeExt)));
         end     
         function [dt0_,date_] = readDatetime0(~)
             dt0_ = datetime;
