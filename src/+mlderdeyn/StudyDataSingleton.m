@@ -1,4 +1,4 @@
-classdef StudyDataSingleton < mlpipeline.StudyDataSingleton
+classdef StudyDataSingleton < handle & mlpipeline.StudyDataSingleton
 	%% StudyDataSingleton  
 
 	%  $Revision$
@@ -10,10 +10,12 @@ classdef StudyDataSingleton < mlpipeline.StudyDataSingleton
  	
     
     properties 
+        rawdataDir
         subjectsFolder = {'np755' 'np797'}
     end
     
     properties (Dependent)
+        freesurfersDir
         subjectsDir
     end
     
@@ -32,8 +34,11 @@ classdef StudyDataSingleton < mlpipeline.StudyDataSingleton
     
     methods
         
-        %% GET        
+        %% GET/SET       
         
+        function g    = get.freesurfersDir(this)
+            g = this.subjectsDir;
+        end
         function g    = get.subjectsDir(this)
             if (~isempty(this.subjectsDir_))
                 g = this.subjectsDir_;
@@ -41,16 +46,14 @@ classdef StudyDataSingleton < mlpipeline.StudyDataSingleton
             end
             g = cellfun(@(x) fullfile(getenv('CVL'), x, ''), this.subjectsFolder, 'UniformOutput', false);
         end
-        function this = set.subjectsDir(this, s)
-            assert(isdir(s));
-            this.subjectsDir_ = s;
+        function        set.subjectsDir(this, s)
+            if (isdir(s))
+                this.subjectsDir_ = s;
+            end
         end
         
         %% 
        
-        function d    = freesurfersDir(this)
-            d = this.subjectsDir;
-        end
         function        register(this, varargin)
             %% REGISTER this class' persistent instance with mlpipeline.StudyDataSingletons
             %  using the latter class' register methods.

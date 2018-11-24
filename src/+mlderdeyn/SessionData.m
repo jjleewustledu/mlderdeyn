@@ -11,16 +11,27 @@ classdef SessionData < mlpipeline.SessionData
     
     properties
         filetypeExt = '.nii.gz'
+        rawdataDir
+        rawdataFolder
         resolveTag = ''
+        vfolder
     end
     
     properties (Dependent)
         petBlur
+        vLocation
     end
     
     methods %% GET
         function g = get.petBlur(~)
             g = mlpet.PETRegistry.instance.petPointSpread;
+        end
+        function g = get.vLocation(this)
+            if (iscell(this.sessionPath))
+                g = this.sessionPath{1};
+                return
+            end
+            g = this.sessionPath;
         end
     end
     
