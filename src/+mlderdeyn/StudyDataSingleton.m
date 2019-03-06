@@ -10,7 +10,6 @@ classdef StudyDataSingleton < handle & mlpipeline.StudyDataSingleton
  	
     
     properties 
-        rawdataDir
         subjectsFolder = {'np755' 'np797'}
     end
     

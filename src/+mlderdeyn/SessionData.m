@@ -11,27 +11,16 @@ classdef SessionData < mlpipeline.SessionData
     
     properties
         filetypeExt = '.nii.gz'
-        rawdataDir
-        rawdataFolder
         resolveTag = ''
-        vfolder
     end
     
     properties (Dependent)
         petBlur
-        vLocation
     end
     
     methods %% GET
         function g = get.petBlur(~)
             g = mlpet.PETRegistry.instance.petPointSpread;
-        end
-        function g = get.vLocation(this)
-            if (iscell(this.sessionPath))
-                g = this.sessionPath{1};
-                return
-            end
-            g = this.sessionPath;
         end
     end
     
@@ -61,7 +50,7 @@ classdef SessionData < mlpipeline.SessionData
             parse(ip, varargin{:});
             
             loc = locationType(ip.Results.typ, ...
-                fullfile(this.vLocation, 'ECAT_EXACT', 'coss', ''));
+                fullfile(this.sessionPath, 'ECAT_EXACT', 'coss', ''));
         end
         function loc = hdrinfoLocation(this, varargin)
             ip = inputParser;
@@ -69,7 +58,7 @@ classdef SessionData < mlpipeline.SessionData
             parse(ip, varargin{:});
             
             loc = locationType(ip.Results.typ, ...
-                fullfile(this.vLocation, 'ECAT_EXACT', 'hdr_backup', ''));
+                fullfile(this.sessionPath, 'ECAT_EXACT', 'hdr_backup', ''));
         end
         function loc = petLocation(this, varargin)
             ip = inputParser;
@@ -77,7 +66,7 @@ classdef SessionData < mlpipeline.SessionData
             parse(ip, varargin{:});
             
             loc = locationType(ip.Results.typ, ...
-                fullfile(this.vLocation, 'ECAT_EXACT', 'pet', ''));
+                fullfile(this.sessionPath, 'ECAT_EXACT', 'pet', ''));
         end
         
         function obj = cbf(this, varargin)
