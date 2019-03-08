@@ -10,7 +10,7 @@ classdef StudyDataSingleton < handle & mlpipeline.StudyDataSingleton
  	
     
     properties 
-        subjectsFolder = {'np755' 'np797'}
+        npfolders = {'np755' 'np797'}
     end
     
     properties (Dependent)
@@ -43,7 +43,7 @@ classdef StudyDataSingleton < handle & mlpipeline.StudyDataSingleton
                 g = this.subjectsDir_;
                 return
             end
-            g = cellfun(@(x) fullfile(getenv('CVL'), x, ''), this.subjectsFolder, 'UniformOutput', false);
+            g = cellfun(@(x) fullfile(getenv('CVL'), x, ''), this.npfolders, 'UniformOutput', false);
         end
         function        set.subjectsDir(this, s)
             if (isdir(s))
